@@ -12,7 +12,7 @@
 /* Parameters that control the main correlation calculation */
 #define TIMING
 //#define USE_MPI
-//#define USE_OMP
+#define USE_OMP
 //#define DEBUGME
 
 /* Parameters that control the estimation phase */

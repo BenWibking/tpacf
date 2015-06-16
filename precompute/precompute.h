@@ -66,5 +66,6 @@ typedef struct _filelist{
 
 int convertAng(char infile[],int NumSamples);
 int convertSpa(char infile[],int NumSamples);
+int convertSpa_xyz(char infile[],int NumSamples);
 int angTree(char filename[],splitlog dsplit[],int NumData,int NumSamples,int flag);
 int spaTree(char filename[],splitlog dsplit[],int NumData,int NumSamples,int flag);

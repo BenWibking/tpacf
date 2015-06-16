@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]){
 
-/* Driver code to convert ra/dec pairs to x,y,z.  Also builds				*
+/* Driver code to read in x,y,z positions.  Also builds				*
  * tree for each data set contained in a file.  Converted data is output to a file(s) with	*
  * the same name as the original data file, appended with ".bin".  Tree is likewise	*
  * output to the same name, appended with ".tree".  Both are in unformatted binary,	*
@@ -59,10 +59,12 @@ int main(int argc, char *argv[]){
 	fscanf(list,"%s%*[^\n]",&infile[0]);
 	printf("%s ",infile);
 	if(AngOrSpa == 0){
-		NumData = convertAng(infile,NumSamples);
-		NumFiles = angTree(infile,dsplit,NumData,NumSamples,0);
+	      fprintf(stderr,"Not implemented: angular correlation function with x,y,z input.\n");
+	      exit(1);
+	      //NumData = convertAng(infile,NumSamples);
+	      //NumFiles = angTree(infile,dsplit,NumData,NumSamples,0);
 	}else{
-		NumData = convertSpa(infile,NumSamples);
+		NumData = convertSpa_xyz(infile,NumSamples);
 		NumFiles = spaTree(infile,dsplit,NumData,NumSamples,0);
 	}
 	if(NumFiles == 0){
@@ -77,11 +79,13 @@ int main(int argc, char *argv[]){
 		if(!feof(list)){
 			printf("%s ",infile);
 			if(AngOrSpa == 0){
-				NumData = convertAng(infile,NumSamples);
-				NumFiles = angTree(infile,dsplit,NumData,NumSamples,1);
+			  fprintf(stderr,"Not implemented: angular correlation function with x,y,z input.\n");
+			  exit(1);			  
+			  //NumData = convertAng(infile,NumSamples);
+			  //NumFiles = angTree(infile,dsplit,NumData,NumSamples,1);
 			}else{
-				NumData = convertSpa(infile,NumSamples);
-				NumFiles = spaTree(infile,dsplit,NumData,NumSamples,1);
+			  NumData = convertSpa_xyz(infile,NumSamples);
+			  NumFiles = spaTree(infile,dsplit,NumData,NumSamples,1);
 			}
 			if(NumFiles == 0){
 				fprintf(stderr,"Failed to print results\n");
