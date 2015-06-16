@@ -90,7 +90,9 @@ int convertSpa_xyz(char infile[],int NumSamples){
 	#endif
 	Cnt = 0;
 	while(!feof(in)){
-		fscanf(in,"%lf %lf %lf%*[^\n]",&pcdata.x,&pcdata.y,&pcdata.z);
+	  //		fscanf(in,"%lf %lf %lf%*[^\n]",&pcdata.x,&pcdata.y,&pcdata.z);
+		fscanf(in,"%le,%le,%le[^\n]",&pcdata.x,&pcdata.y,&pcdata.z);
+		//printf("%le %le %le\n",pcdata.x,pcdata.y,pcdata.z);
 		if(!feof(in)){
 			Cnt++;
 			//pcdata.x = dist*cos(raRad)*cdecRad;

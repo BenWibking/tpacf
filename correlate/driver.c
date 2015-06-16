@@ -380,7 +380,7 @@ Note that this function converts the input angles from degrees to radians
 		fscanf(paramFile,"%d%*[^\n]",getDD);
 		fscanf(paramFile,"%d%*[^\n]",getDR);
 		fscanf(paramFile,"%d%*[^\n]",getRR);
-		fscanf(paramFile,"%d%*[^\n]",WorkLevel);
+		fscanf(paramFile,"%d%*[^\n]",WorkLevel); // what is this??
 		fscanf(paramFile,"%d%*[^\n]",&NumBins);
 		fscanf(paramFile,"%lf%*[^\n]",minDist);
 		fscanf(paramFile,"%lf%*[^\n]",maxDist);
