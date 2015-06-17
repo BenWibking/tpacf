@@ -58,12 +58,12 @@
 		cc_shared(srcs,targs,worknodes,tree2,bins,NumWorkNodes,MyId) :	\
 		cc_shared(srcs,targs,worknodes,tree2,bins,NumWorkNodes,MyId)
 #else
-	#define AC(sources,tree1,tree2,bins) (AngOrSpa==0) ?						\
-		ac_serial(sources,tree2,tree2,bins) :					\
-		ac_serial(sources,tree2,tree2,bins)
-	#define CC(srcs,targs,worknodes,tree1,tree2,bins) (AngOrSpa==0) ?				\
-		cc_serial(srcs,targs,tree1,tree2,bins) :				\
-		cc_serial(srcs,targs,tree1,tree2,bins)
+#define AC(sources,tree1,tree2,bins,Lbox) (AngOrSpa==0) ?	\
+  ac_serial(sources,tree2,tree2,bins,Lbox) :			\
+						    ac_serial(sources,tree2,tree2,bins,Lbox)
+#define CC(srcs,targs,worknodes,tree1,tree2,bins,Lbox) (AngOrSpa==0) ?	\
+ cc_serial(srcs,targs,tree1,tree2,bins,Lbox) :			\
+						      cc_serial(srcs,targs,tree1,tree2,bins,Lbox)
 #endif
 
 
@@ -122,7 +122,7 @@ typedef struct _angTreeNode{
 ********************/
 
 /* input parameter function */
-void getParams(char paramFile[],char fileList[],int *getDD,int *getDR,int *getRR,int *WorkLevel,double *minAngle,double *maxAngle);
+void getParams(char paramFile[],char fileList[],int *getDD,int *getDR,int *getRR,int *WorkLevel,double *minAngle,double *maxAngle,double *Lbox);
 
 
 /* correlation functions */
@@ -139,8 +139,8 @@ void getParams(char paramFile[],char fileList[],int *getDD,int *getDR,int *getRR
 		void ac_shared(const pcsource data[],void *worknodes[],void *root,bin bins[],int NumWorkNodes,int MyId);
 		void cc_shared(const pcsource data[],const pcsource rand[],void *worknodes[],void *rootRandTree,bin bins[],int NumWorkNodes,int MyId);
 	#else
-		void ac_serial(const pcsource data[],void *root1,void *root2,bin bins[]);
-		void cc_serial(const pcsource dataA[],const pcsource dataB[],void *root1,void *root2,bin bins[]);
+void ac_serial(const pcsource data[],void *root1,void *root2,bin bins[], const double Lbox);
+		void cc_serial(const pcsource dataA[],const pcsource dataB[],void *root1,void *root2,bin bins[], const double Lbox);
 	#endif
 #endif
 

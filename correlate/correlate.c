@@ -438,10 +438,18 @@ static void dualtreeACspatial(const pcsource data[],void *nodeA,void *nodeB,bin 
  *				      dualtreeCCspatial					*
  *											*
  ****************************************************************************************/
-static void dualtreeCCspatial(const pcsource data1[],const pcsource data2[],void *nodeA,void *nodeB,bin bins[]){
+static void dualtreeCCspatial(const pcsource data1[],const pcsource data2[],void *nodeA,void *nodeB,bin bins[],const double Lbox, const int lx, const int ly, const int lz){
 
 /* Main routine to cross correlate two data sets A and B.	*
  * Described in Dolence & Brunner (2007).			*/
+
+  /* periodic boundary conditions */
+  /* we need to modify the relative position of node2 and data2: */
+  /*  node2->xmin --> (node2->xmin + Lbox*Lx_offset)
+      node2->xmax --> (node2->xmax + Lbox*Lx_offset)
+      ... [for ymin,ymax,zmin,zmax] ...
+      data2[i].x --> (data2[i].x + Lbox*Lx_offset)
+      ... [for .y, .z] ... */
 
 	unsigned int i,j,N2Start,N2End,Sample1,Sample2,BinEnd;
 	unsigned long long int Add,*CntSave;
@@ -1395,17 +1403,17 @@ static void dualtreeCCangular(const pcsource data1[],const pcsource data2[],void
 		dualtreeACangular(data,(node1),(node2),bins) :			\
 		dualtreeACspatial(data,(node1),(node2),bins)
 		
-#define DTCC(data,rand,node1,node2,bins) (AngOrSpa == 0) ?			\
-		dualtreeCCangular(data,rand,node1,node2,bins) :			\
-		dualtreeCCspatial(data,rand,node1,node2,bins)
+#define DTCC(data,rand,node1,node2,bins,Lbox,lx,ly,lz) (AngOrSpa == 0) ?	\
+  dualtreeCCangular(data,rand,node1,node2,bins) :		\
+							     dualtreeCCspatial(data,rand,node1,node2,bins,Lbox,lx,ly,lz)
 		
 #define DTAC_ROOT(data,node,child1,child2,root,bins) (AngOrSpa == 0) ?					\
 		dualtreeACangular(data,(void *)((((angTreeNode *)node)->child1)->child2),root,bins) :	\
 		dualtreeACspatial(data,(void *)((((spaTreeNode *)node)->child1)->child2),root,bins)
 		
-#define DTCC_ROOT(data,rand,node,child1,child2,root,bins) (AngOrSpa == 0) ?					\
-		dualtreeCCangular(data,rand,(void *)((((angTreeNode *)node)->child1)->child2),root,bins) :	\
-		dualtreeCCspatial(data,rand,(void *)((((spaTreeNode *)node)->child1)->child2),root,bins)
+#define DTCC_ROOT(data,rand,node,child1,child2,root,bins,Lbox,lx,ly,lz) (AngOrSpa == 0) ? \
+  dualtreeCCangular(data,rand,(void *)((((angTreeNode *)node)->child1)->child2),root,bins) : \
+  dualtreeCCspatial(data,rand,(void *)((((spaTreeNode *)node)->child1)->child2),root,bins,Lbox,lx,ly,lz)
 /*
 #define DTAC(data,child1,child2,root,bins) ((*dualtreeAC)==dualtreeACangular) ?			\
 		(*dualtreeAC)(data,(void *)(atemp->child1)->child2,root,bins) :			\
@@ -1418,18 +1426,40 @@ static void dualtreeCCangular(const pcsource data1[],const pcsource data2[],void
 #ifndef USE_MPI
 
 #ifndef USE_OMP
-void ac_serial(const pcsource data[],void *root1,void *root2,bin bins[]){
+void ac_serial(const pcsource data[],void *root1,void *root2,bin bins[],double Lbox){
 
 	TIMESTART(startTime);
 	DTAC(data,root1,root2,bins);
+
+	#ifdef PERIODIC
+	printf("Computing periodic images.\n");
+	int i,j,k;
+	for(i=-1;i<=1;i++)
+	  for(j=-1;j<=1;j++)
+	    for(k=-1;k<=1;k++)
+	      if(!(i==0 && j==0 && k==0))
+		DTCC(data,data,root1,root2,bins,Lbox,i,j,k);
+	#endif
+
 	TIMESTOP(wallTimeAC,startTime);
 	return;
 }
 
-void cc_serial(const pcsource dataA[],const pcsource dataB[],void *root1,void *root2,bin bins[]){
+void cc_serial(const pcsource dataA[],const pcsource dataB[],void *root1,void *root2,bin bins[],double Lbox){
 
 	TIMESTART(startTime);
-	DTCC(dataA,dataB,root1,root2,bins);
+	DTCC(dataA,dataB,root1,root2,bins,Lbox,0,0,0);
+
+	#ifdef PERIODIC
+	printf("Computing periodic images.\n");
+	int i,j,k;
+	for(i=-1;i<=1;i++)
+	  for(j=-1;j<=1;j++)
+	    for(k=-1;k<=1;k++)
+	      if(!(i==0 && j==0 && k==0))
+		DTCC(dataA,dataB,root1,root2,bins,Lbox,i,j,k);
+	#endif
+
 	TIMESTOP(wallTimeCC,startTime);
 	return;
 }

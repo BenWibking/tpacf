@@ -17,6 +17,7 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 	int i,j,NumData,NumRand,WorkLevel,NumDataFiles,NumRandFiles,Terminate;
 	int *Dsamples,*Rsamples,getDD,getDR,getRR;
 	double minDist,maxDist;
+	double Lbox;
 	FILE *list;
 	pcsource *data,*rand,*block1,*block2;
 	void *rootDataTree,*rootRandTree,*tblock1,*tblock2;
@@ -78,8 +79,10 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 	#ifdef USE_MPI
 		getParams(argv[1],fileList,&getDD,&getDR,&getRR,&WorkLevel,&minDist,&maxDist);
 	#else
-		getParams(argv[1],fileList,&getDD,&getDR,&getRR,&WorkLevel,&minDist,&maxDist);
+		getParams(argv[1],fileList,&getDD,&getDR,&getRR,&WorkLevel,&minDist,&maxDist,&Lbox);
+		printf("Box size: %lf\n",Lbox);
 	#endif
+
 	/* Initialize timing variables */
 	#ifdef TIMING
 		wallTimeAC = wallTimeCC = wallTimeTotal = 0.;
@@ -160,7 +163,7 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 			}
 			#pragma omp barrier
 			if(i==0) BINBUILD(ddbins);				// Build bins if necessary
-			AC(data,dworknodes,rootDataTree,ddbins);		// Now count the pairs
+			AC(data,dworknodes,rootDataTree,ddbins,Lbox);		// Now count the pairs
 			for(j=i+1;j<NumDataFiles;j++){				// Loop over this data sets files
 				#pragma omp master
 				{
@@ -169,7 +172,7 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 					rootRandTree = treeRead(curFile,tblock2);
 				}
 				#pragma omp barrier
-				CC(data,rand,dworknodes,rootDataTree,rootRandTree,ddbins);
+				CC(data,rand,dworknodes,rootDataTree,rootRandTree,ddbins,Lbox);
 			}
 		}
 		
@@ -249,7 +252,7 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 					}
 					#pragma omp barrier
 					/* Get the counts */
-					CC(rand,data,rworknodes,rootRandTree,rootDataTree,drbins);
+					CC(rand,data,rworknodes,rootRandTree,rootDataTree,drbins,Lbox);
 				}
 			}
 
@@ -259,7 +262,7 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 				if(i == 0){
 					BINBUILD(rrbins);
 				}
-				AC(rand,rworknodes,rootRandTree,rrbins);
+				AC(rand,rworknodes,rootRandTree,rrbins,Lbox);
 				for(j=i+1;j<NumRandFiles;j++){
 					#pragma omp master
 					{
@@ -269,7 +272,7 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 					}
 					#pragma omp barrier
 					/* Get the counts */
-					CC(rand,data,rworknodes,rootRandTree,rootDataTree,rrbins);
+					CC(rand,data,rworknodes,rootRandTree,rootDataTree,rrbins,Lbox);
 				}
 			}
 		}
@@ -407,7 +410,7 @@ Note that this function converts the input angles from degrees to radians
 	return;
 }
 #else	/* NOT USE_MPI */
-void getParams(char parameterFile[],char fileList[],int *getDD,int *getDR,int *getRR,int *WorkLevel,double *minDist,double *maxDist){
+void getParams(char parameterFile[],char fileList[],int *getDD,int *getDR,int *getRR,int *WorkLevel,double *minDist,double *maxDist,double *Lbox){
 
 /*
 Reads in parameters from parameterFile
@@ -429,6 +432,7 @@ Note that this function converts the input angles from degrees to radians
 	fscanf(paramFile,"%lf%*[^\n]",minDist);
 	fscanf(paramFile,"%lf%*[^\n]",maxDist);
 	fscanf(paramFile,"%d%*[^\n]",&AngOrSpa);
+	fscanf(paramFile,"%lf%*[^\n]",Lbox);
 
 	if(AngOrSpa == 0){
 		*minDist *= M_PI/180.;

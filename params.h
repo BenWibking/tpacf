@@ -12,6 +12,7 @@
 #define MAX_SPATIAL_NODE_CNT 32
 
 /* Parameters that control the main correlation calculation */
+#define PERIODIC
 #define TIMING
 //#define USE_MPI
 //#define USE_OMP
