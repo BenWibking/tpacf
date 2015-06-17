@@ -3,6 +3,8 @@
 #define BUFFER_SIZE 100
 
 /* Parameters that control the precomputing phase */
+#define USE_HDF5
+
 #define USE_DISK
 #define MAXNUM_PER_FILE 50000000
 #define DEFAULT_NUM_SAMPLES 16

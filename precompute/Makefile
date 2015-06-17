@@ -2,8 +2,8 @@ include ../make.config
 
 CC = $(CCSERIAL)
 CFLAGS = $(CFLAGSSERIAL)
-INCLDIRS = -I /usr/include -I ../
-LFLAGS = -lm # -lsvml
+INCLDIRS = -I /usr/include -I /usr/local/include -I ../
+LFLAGS = -L /usr/local/lib -lm -lhdf5 -lhdf5_hl # -lsvml
 SOURCES = driver.c pcsource.c tree.c
 OBJECTS = $(SOURCES:.c=.o)
 HEADERS = precompute.h ../params.h

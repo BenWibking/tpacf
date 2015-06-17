@@ -64,7 +64,7 @@ int main(int argc, char *argv[]){
 	      //NumData = convertAng(infile,NumSamples);
 	      //NumFiles = angTree(infile,dsplit,NumData,NumSamples,0);
 	}else{
-		NumData = convertSpa_xyz(infile,NumSamples);
+		NumData = convertSpa_xyz_hdf5(infile,NumSamples);
 		NumFiles = spaTree(infile,dsplit,NumData,NumSamples,0);
 	}
 	if(NumFiles == 0){
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]){
 			  //NumData = convertAng(infile,NumSamples);
 			  //NumFiles = angTree(infile,dsplit,NumData,NumSamples,1);
 			}else{
-			  NumData = convertSpa_xyz(infile,NumSamples);
+			  NumData = convertSpa_xyz_hdf5(infile,NumSamples);
 			  NumFiles = spaTree(infile,dsplit,NumData,NumSamples,1);
 			}
 			if(NumFiles == 0){

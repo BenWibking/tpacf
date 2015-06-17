@@ -59,6 +59,76 @@ static double dm(double z){
 
 }
 
+int convertSpa_xyz_hdf5(char infile[],int NumSamples){
+
+/* Reads in data from file infile *as x,y,z* and outputs it to infile.bin.		*
+ * Also prints information about the number of jackknife samples and number of data points.	*/
+
+	int Cnt;
+	char outfile[BUFFER_SIZE];
+	//zsource sdata;
+	pcsource pcdata;
+	//FILE *in,*out;
+	FILE *out;
+	#ifndef USE_DISK
+	int i;
+	#endif
+	
+	//in = fopen(infile,"r");
+	#ifdef USE_DISK
+	sprintf(outfile,"%s.bin.temp",infile);
+	#else
+	sprintf(outfile,"%s0.bin",infile);
+	#endif
+	out = fopen(outfile,"w");
+	Cnt=NumSamples;
+	
+	#ifndef USE_DISK
+	fwrite(&Cnt,sizeof(int),1,out);
+	for(i=0;i<=NumSamples;i++){
+		fwrite(&Cnt,sizeof(int),1,out);
+	}
+	#endif
+	Cnt = 0;
+
+	/* open HDF5 file*/
+	double * data;
+	hid_t file_id;
+	hsize_t dims[2];
+	
+	file_id = H5Fopen(infile, H5F_ACC_RDONLY, H5P_DEFAULT);
+	H5LTget_dataset_info(file_id,"/particles",dims,NULL,NULL);
+
+	size_t i,nrow,n_values;
+	n_values = (size_t)(dims[0] * dims[1]);
+	nrow = (size_t)dims[1];
+
+	data = malloc(n_values*sizeof(double));
+	H5LTread_dataset_int(file_id,"/particles",data);
+
+	//while(!feof(in)){
+	for(i=0; i<n_values/nrow; i++) {
+	  pcdata.x = data[i*nrow + 0];
+	  pcdata.y = data[i*nrow + 1];
+	  pcdata.z = data[i*nrow + 2];
+	  printf("%le %le %le\n",pcdata.x,pcdata.y,pcdata.z);
+	  Cnt++;
+	  fwrite(&pcdata,sizeof(pcsource),1,out);
+	}
+	printf("%d\n",Cnt);
+	#ifndef USE_DISK
+	rewind(out);
+	fwrite(&NumSamples,sizeof(int),1,out);
+	fwrite(&Cnt,sizeof(int),1,out);
+	#endif
+
+        //fclose(in);
+        H5Fclose(file_id);
+	fclose(out);
+
+	return Cnt;
+}
+
 int convertSpa_xyz(char infile[],int NumSamples){
 
 /* Reads in data from file infile *as x,y,z* and outputs it to infile.bin.		*

@@ -5,6 +5,11 @@
 #include <string.h>
 #include "params.h"
 
+#ifdef USE_HDF5
+        #include "hdf5.h"
+        #include "hdf5_hl.h"
+#endif
+
 #ifdef USE_DISK
 	#include <sys/types.h>
 	#include <sys/mman.h>
@@ -67,5 +72,6 @@ typedef struct _filelist{
 int convertAng(char infile[],int NumSamples);
 int convertSpa(char infile[],int NumSamples);
 int convertSpa_xyz(char infile[],int NumSamples);
+int convertSpa_xyz_hdf5(char infile[],int NumSamples);
 int angTree(char filename[],splitlog dsplit[],int NumData,int NumSamples,int flag);
 int spaTree(char filename[],splitlog dsplit[],int NumData,int NumSamples,int flag);
