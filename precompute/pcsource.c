@@ -92,26 +92,44 @@ int convertSpa_xyz_hdf5(char infile[],int NumSamples){
 	Cnt = 0;
 
 	/* open HDF5 file*/
-	double * data;
-	hid_t file_id;
+	typedef struct xyz {
+	  float x;
+	  float y;
+	  float z;
+	} xyz;
+	xyz * data;
+	hid_t xyz_tid;
+
+	hid_t file_id, dataset, space;
 	hsize_t dims[2];
 	
 	file_id = H5Fopen(infile, H5F_ACC_RDONLY, H5P_DEFAULT);
-	H5LTget_dataset_info(file_id,"/particles",dims,NULL,NULL);
+	printf("opened file.\n");
 
-	size_t i,nrow,n_values;
-	n_values = (size_t)(dims[0] * dims[1]);
-	nrow = (size_t)dims[1];
+	dataset = H5Dopen(file_id, "particles", H5P_DEFAULT);
 
-	data = malloc(n_values*sizeof(double));
-	H5LTread_dataset_int(file_id,"/particles",data);
+	space = H5Dget_space(dataset);
+	H5Sget_simple_extent_dims(space, dims, NULL);
+	data = (xyz*) malloc(dims[0]*sizeof(xyz));
+
+	xyz_tid = H5Tcreate(H5T_COMPOUND, sizeof(xyz));
+	H5Tinsert(xyz_tid, "x", HOFFSET(xyz,x), H5T_NATIVE_FLOAT);
+	H5Tinsert(xyz_tid, "y", HOFFSET(xyz,y), H5T_NATIVE_FLOAT);
+	H5Tinsert(xyz_tid, "z", HOFFSET(xyz,z), H5T_NATIVE_FLOAT);
+
+	H5Dread(dataset, xyz_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+
+	size_t i;
+	for(i=0; i<3; i++) {
+	  printf("%f %f %f\n",data[i].x,data[i].y,data[i].z);
+	}
 
 	//while(!feof(in)){
-	for(i=0; i<n_values/nrow; i++) {
-	  pcdata.x = data[i*nrow + 0];
-	  pcdata.y = data[i*nrow + 1];
-	  pcdata.z = data[i*nrow + 2];
-	  printf("%le %le %le\n",pcdata.x,pcdata.y,pcdata.z);
+	for(i=0; i<dims[0]; i++) {
+	  pcdata.x = data[i].x;
+	  pcdata.y = data[i].y;
+	  pcdata.z = data[i].z;
+	  //printf("%le %le %le\n",pcdata.x,pcdata.y,pcdata.z);
 	  Cnt++;
 	  fwrite(&pcdata,sizeof(pcsource),1,out);
 	}
