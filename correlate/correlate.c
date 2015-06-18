@@ -445,8 +445,8 @@ static void dualtreeCCspatial(const pcsource data1[],const pcsource data2[],void
 
   /* periodic boundary conditions */
   /* we need to modify the relative position of node2 and data2: */
-  /*  node2->xmin --> (node2->xmin + Lbox*Lx_offset)
-      node2->xmax --> (node2->xmax + Lbox*Lx_offset)
+  /*  (node2->xmin + Lbox*lx) --> ((node2->xmin + Lbox*lx) + Lbox*Lx_offset)
+      (node2->xmax + Lbox*lx) --> ((node2->xmax + Lbox*lx) + Lbox*Lx_offset)
       ... [for ymin,ymax,zmin,zmax] ...
       data2[i].x --> (data2[i].x + Lbox*Lx_offset)
       ... [for .y, .z] ... */
@@ -493,41 +493,41 @@ static void dualtreeCCspatial(const pcsource data1[],const pcsource data2[],void
 		BinStart = mystack->Fbin;
 		BinStop = mystack->Lbin;
 
-		if(node1->xmax < node2->xmin){
-			dxmin = node2->xmin - node1->xmax;;
-			dxmax = node2->xmax - node1->xmin;
-		}else if(node1->xmin > node2->xmax){
-			dxmin = node1->xmin - node2->xmax;
-			dxmax = node1->xmax - node2->xmin;
+		if(node1->xmax < (node2->xmin + Lbox*lx)){
+			dxmin = (node2->xmin + Lbox*lx) - node1->xmax;;
+			dxmax = (node2->xmax + Lbox*lx) - node1->xmin;
+		}else if(node1->xmin > (node2->xmax + Lbox*lx)){
+			dxmin = node1->xmin - (node2->xmax + Lbox*lx);
+			dxmax = node1->xmax - (node2->xmin + Lbox*lx);
 		}else{
-			dxmin = node1->xmax - node2->xmin;
-			dxmax = node2->xmax - node1->xmin;
+			dxmin = node1->xmax - (node2->xmin + Lbox*lx);
+			dxmax = (node2->xmax + Lbox*lx) - node1->xmin;
 			if(dxmin > dxmax)	dxmax = dxmin;
 			dxmin = 0.;
 		}
 
-		if(node1->ymax < node2->ymin){
-			dymin = node2->ymin - node1->ymax;
-			dymax = node2->ymax - node1->ymin;
-		}else if(node1->ymin > node2->ymax){
-			dymin = node1->ymin - node2->ymax;
-			dymax = node1->ymax - node2->ymin;
+		if(node1->ymax < (node2->ymin + Lbox*ly)){
+			dymin = (node2->ymin + Lbox*ly) - node1->ymax;
+			dymax = (node2->ymax + Lbox*ly) - node1->ymin;
+		}else if(node1->ymin > (node2->ymax + Lbox*ly)){
+			dymin = node1->ymin - (node2->ymax + Lbox*ly);
+			dymax = node1->ymax - (node2->ymin + Lbox*ly);
 		}else{
-			dymin = node1->ymax - node2->ymin;
-			dymax = node2->ymax - node1->ymin;
+			dymin = node1->ymax - (node2->ymin + Lbox*ly);
+			dymax = (node2->ymax + Lbox*ly) - node1->ymin;
 			if(dymin > dymax) dymax = dymin;
 			dymin = 0.;
 		}	
 
-		if(node1->zmax < node2->zmin){
-			dzmin = node2->zmin - node1->zmax;
-			dzmax = node2->zmax - node1->zmin;
-		}else if(node1->zmin > node2->zmax){
-			dzmin = node1->zmin - node2->zmax;
-			dzmax = node1->zmax - node2->zmin;
+		if(node1->zmax < (node2->zmin + Lbox*lz)){
+			dzmin = (node2->zmin + Lbox*lz) - node1->zmax;
+			dzmax = (node2->zmax + Lbox*lz) - node1->zmin;
+		}else if(node1->zmin > (node2->zmax + Lbox*lz)){
+			dzmin = node1->zmin - (node2->zmax + Lbox*lz);
+			dzmax = node1->zmax - (node2->zmin + Lbox*lz);
 		}else{
-			dzmin = node1->zmax - node2->zmin;
-			dzmax = node2->zmax - node1->zmin;
+			dzmin = node1->zmax - (node2->zmin + Lbox*lz);
+			dzmax = (node2->zmax + Lbox*lz) - node1->zmin;
 			if(dzmin > dzmax) dzmax = dzmin;
 			dzmin = 0.;
 		}
@@ -587,39 +587,39 @@ static void dualtreeCCspatial(const pcsource data1[],const pcsource data2[],void
 			N2End = node2->End;
 			for(i=node1->Start;i<=node1->End;i++){
 			
-				if(data1[i].x < node2->xmin){
-					dxmin = node2->xmin - data1[i].x;
-					dxmax = node2->xmax - data1[i].x;
-				}else if(data1[i].x > node2->xmax){
-					dxmin = data1[i].x - node2->xmax;
-					dxmax = data1[i].x - node2->xmin;
+				if(data1[i].x < (node2->xmin + Lbox*lx)){
+					dxmin = (node2->xmin + Lbox*lx) - data1[i].x;
+					dxmax = (node2->xmax + Lbox*lx) - data1[i].x;
+				}else if(data1[i].x > (node2->xmax + Lbox*lx)){
+					dxmin = data1[i].x - (node2->xmax + Lbox*lx);
+					dxmax = data1[i].x - (node2->xmin + Lbox*lx);
 				}else{
-					dxmin = data1[i].x - node2->xmin;
-					dxmax = node2->xmax - data1[i].x;
+					dxmin = data1[i].x - (node2->xmin + Lbox*lx);
+					dxmax = (node2->xmax + Lbox*lx) - data1[i].x;
 					if(dxmin > dxmax) dxmax = dxmin;
 					dxmin = 0.;
 				}
-				if(data1[i].y < node2->ymin){
-					dymin = node2->ymin - data1[i].y;
-					dymax = node2->ymax - data1[i].y;
-				}else if(data1[i].y > node2->ymax){
-					dymin = data1[i].y - node2->ymax;
-					dymax = data1[i].y - node2->ymin;
+				if(data1[i].y < (node2->ymin + Lbox*ly)){
+					dymin = (node2->ymin + Lbox*ly) - data1[i].y;
+					dymax = (node2->ymax + Lbox*ly) - data1[i].y;
+				}else if(data1[i].y > (node2->ymax + Lbox*ly)){
+					dymin = data1[i].y - (node2->ymax + Lbox*ly);
+					dymax = data1[i].y - (node2->ymin + Lbox*ly);
 				}else{
-					dymin = data1[i].y - node2->ymin;
-					dymax = node2->ymax - data1[i].y;
+					dymin = data1[i].y - (node2->ymin + Lbox*ly);
+					dymax = (node2->ymax + Lbox*ly) - data1[i].y;
 				if(dymin > dymax) dymax = dymin;
 					dymin = 0.;
 				}
-				if(data1[i].z < node2->zmin){
-					dzmin = node2->zmin - data1[i].z;
-					dzmax = node2->zmax - data1[i].z;
-				}else if(data1[i].z > node2->zmax){
-					dzmin = data1[i].z - node2->zmax;
-					dzmax = data1[i].z - node2->zmin;
+				if(data1[i].z < (node2->zmin + Lbox*lz)){
+					dzmin = (node2->zmin + Lbox*lz) - data1[i].z;
+					dzmax = (node2->zmax + Lbox*lz) - data1[i].z;
+				}else if(data1[i].z > (node2->zmax + Lbox*lz)){
+					dzmin = data1[i].z - (node2->zmax + Lbox*lz);
+					dzmax = data1[i].z - (node2->zmin + Lbox*lz);
 				}else{
-					dzmin = data1[i].z - node2->zmin;
-					dzmax = node2->zmax - data1[i].z;
+					dzmin = data1[i].z - (node2->zmin + Lbox*lz);
+					dzmax = (node2->zmax + Lbox*lz) - data1[i].z;
 					if(dzmin > dzmax) dzmax = dzmin;
 					dzmin = 0.;
 				}
@@ -646,9 +646,9 @@ static void dualtreeCCspatial(const pcsource data1[],const pcsource data2[],void
 				/* Brute force calculation necessary */
 				/* More efficient to avoid references to a node in the inner loop */
 				for(j=N2Start;j<=N2End;j++){
-					dxmin = data1[i].x - data2[j].x;
-					dymin = data1[i].y - data2[j].y;
-					dzmin = data1[i].z - data2[j].z;
+					dxmin = data1[i].x - (data2[j].x + Lbox*lx);
+					dymin = data1[i].y - (data2[j].y + Lbox*ly);
+					dzmin = data1[i].z - (data2[j].z + Lbox*lz);
 					mindist = dxmin*dxmin + dymin*dymin + dzmin*dzmin;
 					Bin1 = Bin2;
 					while(mindist < bins[Bin1].limit){
