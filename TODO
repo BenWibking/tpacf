@@ -1,5 +1,6 @@
 ==
 TODO
 
+** Fix crash when cross-correlation is computing without any jackknife samples
 * Test cross-correlation function with periodic boundary conditions
 * Add support for (plane-parallel) projected correlation functions
