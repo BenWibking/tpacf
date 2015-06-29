@@ -1432,7 +1432,7 @@ void ac_serial(const pcsource data[],void *root1,void *root2,bin bins[],double L
 	DTAC(data,root1,root2,bins);
 
 	#ifdef PERIODIC
-	printf("Computing periodic images.\n");
+	printf("Computing periodic images in ac_serial().\n");
 	int i,j,k;
 	for(i=-1;i<=1;i++) {
 	  for(j=-1;j<=1;j++) {
@@ -1456,13 +1456,18 @@ void cc_serial(const pcsource dataA[],const pcsource dataB[],void *root1,void *r
 	DTCC(dataA,dataB,root1,root2,bins,Lbox,0,0,0);
 
 	#ifdef PERIODIC
-	printf("Computing periodic images.\n");
+	printf("Computing periodic images in cc_serial().\n");
 	int i,j,k;
-	for(i=-1;i<=1;i++)
-	  for(j=-1;j<=1;j++)
-	    for(k=-1;k<=1;k++)
-	      if(!(i==0 && j==0 && k==0))
+	for(i=-1;i<=1;i++) {
+	  for(j=-1;j<=1;j++) {
+	    for(k=-1;k<=1;k++) {
+	      if(!(i==0 && j==0 && k==0)) {
+		printf("Computing box [%d, %d, %d]\n",i,j,k);
 		DTCC(dataA,dataB,root1,root2,bins,Lbox,i,j,k);
+	      }
+	    }
+	  }
+	}
 	#endif
 
 	TIMESTOP(wallTimeCC,startTime);
