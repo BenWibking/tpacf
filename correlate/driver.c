@@ -287,7 +287,7 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 			#endif
 				#pragma omp master
 			{
-				sprintf(binOutFile,"%s_%s_drbins",dataName,randName);
+			  sprintf(binOutFile,"%s_%s_drbins",dataName,basename(randName));
 				Dsamples[0] = NumData;
 				Rsamples[0] = NumRand;
 				#ifdef USE_MPI

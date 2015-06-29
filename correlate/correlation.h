@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
+#include <libgen.h>
 #include "params.h"
 #include "timing.h"
 //#include <sys/types.h>

@@ -82,9 +82,14 @@ corr = xsi_xcorr/np.sqrt(xsi*xsi_DM) # can be (much) greater than 1 (but this is
 
 plt.figure()
 plt.plot(bins, bias, '-o', label="bias")
+plt.xscale('log')
+plt.xlim((bins[0],bins[-1]))
+plt.legend(loc='best')
+
+plt.figure()
 plt.plot(bins, corr, '-o', label="pseudo-correlation")
 plt.xscale('log')
 plt.xlim((bins[0],bins[-1]))
-
 plt.legend(loc='best')
+
 plt.show()

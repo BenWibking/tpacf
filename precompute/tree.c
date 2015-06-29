@@ -408,7 +408,7 @@ static void spaTreeBuild(spaTreeNode *node,pcsource data[],int TreeInd[],int Log
 		rNewNode.lptr = NULL;
 		rNewNode.rptr = NULL;
 
-		if(Depth == LogSamples-1){
+		if((Depth == LogSamples-1) || (LogSamples==0 && Depth==0)){ // problem if NumSamples<=1!
 			dsplit[CurSamp-1].Cnt = lNewNode.Cnt;
 			dsplit[CurSamp].Cnt = rNewNode.Cnt;
 			lNewNode.Sample = CurSamp;

@@ -45,6 +45,8 @@ int main(int argc, char *argv[]){
 		NumSamples = DEFAULT_NUM_SAMPLES;
 	}
 
+	printf("NumSamples: %d\n",NumSamples);
+
 	dsplit = malloc((NumSamples+1)*sizeof(splitlog));
 	if(dsplit == NULL){
 		printf("Failed to allocate splitlog...EXITING\n");
@@ -96,9 +98,9 @@ int main(int argc, char *argv[]){
 	}
 	free(dsplit);
 	fclose(list);
-	remove(argv[1]);
+	remove(argv[1]); // why??
 	fclose(newlist);
-	rename(outfile,argv[1]);
+	rename(outfile,argv[1]); // why??
 	return 0;
 }
 
