@@ -22,6 +22,7 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 	pcsource *data,*rand,*block1,*block2;
 	void *rootDataTree,*rootRandTree,*tblock1,*tblock2;
 	bin *ddbins,*drbins,*rrbins;
+	bin *ddbins_periodic,*rrbins_periodic;
 	
 	/* parallel specific variables */
 	#if defined (USE_MPI) || defined (USE_OMP)
@@ -134,9 +135,9 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 	
 	/* Begin OpenMP parallel region */
 	#ifdef TIMING
-	#pragma omp parallel private(ddbins,drbins,rrbins,MyId,i,j,startTime)
+#pragma omp parallel private(ddbins,drbins,rrbins,ddbins_periodic,MyId,i,j,startTime)
 	#else
-	#pragma omp parallel private(ddbins,drbins,rrbins,MyId,i,j)
+#pragma omp parallel private(ddbins,drbins,ddbins_periodic,rrbins,MyId,i,j)
 	#endif
 	{
 	#ifdef USE_OMP
@@ -162,8 +163,8 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 				WORKNODES(rootDataTree,dworknodes);		// Fill list of worknodes, if parallel
 			}
 			#pragma omp barrier
-			if(i==0) BINBUILD(ddbins);				// Build bins if necessary
-			AC(data,dworknodes,rootDataTree,ddbins,Lbox);		// Now count the pairs
+			if(i==0) BINBUILD(ddbins); BINBUILD(ddbins_periodic);				// Build bins if necessary
+			AC(data,dworknodes,rootDataTree,ddbins,ddbins_periodic,Lbox);		// Now count the pairs
 			for(j=i+1;j<NumDataFiles;j++){				// Loop over this data sets files
 				#pragma omp master
 				{
@@ -262,7 +263,7 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 				if(i == 0){
 					BINBUILD(rrbins);
 				}
-				AC(rand,rworknodes,rootRandTree,rrbins,Lbox);
+				AC(rand,rworknodes,rootRandTree,rrbins,rrbins_periodic,Lbox);
 				for(j=i+1;j<NumRandFiles;j++){
 					#pragma omp master
 					{

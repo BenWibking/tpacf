@@ -5,6 +5,9 @@ import math
 
 import argparse
 parser = argparse.ArgumentParser()
+parser.add_argument('mindist',type=float)
+parser.add_argument('maxdist',type=float)
+parser.add_argument('boxsize',type=float)
 parser.add_argument('hod_filename', help='filename of output DD pair counts file')
 parser.add_argument('dm_filename', help='filename of output DD pair counts file')
 parser.add_argument('xcorr_filename', help='filename of output cross-correlation pair counts file')
@@ -21,7 +24,6 @@ ax = fig.add_axes([0.1,0.1,0.8,0.8])
 for filename,skiprows,title in filenames:
 	f = open(filename,'r')
 	header = f.readline()
-	#f.close()
 
 	header_parts = header.split(' ')
 	NumBins = header_parts[0]
@@ -30,25 +32,31 @@ for filename,skiprows,title in filenames:
 	NumBins = int(NumBins) # ~30
 	npart = int(npart) # 10^6
 
-	print NumBins,NumJackknife,npart
+	print "numbins:",NumBins,"numjackknife:",NumJackknife,"npart:",npart
 	
 	if skiprows>1:
 		header_2 = f.readline()
 		header2_parts = header_2.split(' ')
 		NumPart2 = header2_parts[0]
-		print NumPart2
+		print "Numpart2:",NumPart2
 	f.close()
 
 	part = np.loadtxt(filename,skiprows=skiprows)
 
-	maxDist = 30.0 # can this be determined from the file?
-	minDist = 0.1
+	#maxDist = 30.0 # can this be determined from the file?
+	#minDist = 0.1
+	#Lbox = 1911.2 # TODO: add as an argument
 
-	Lbox = 1911.2 # TODO: add as an argument
+	minDist = args.mindist
+	maxDist = args.maxdist
+	Lbox = args.boxsize
 
-	bins = [maxDist*maxDist*(minDist/maxDist)**((2.*i)/(NumBins)) for i in xrange(NumBins)]
-	bins.append(minDist*minDist)
-	rbins = np.array(bins)**0.5
+#	bins = [maxDist*maxDist*(minDist/maxDist)**((2.*i)/(NumBins)) for i in xrange(NumBins)]
+	bins = [maxDist*(minDist/maxDist)**((1.*i)/(NumBins)) for i in xrange(NumBins)]
+	bins.append(minDist)
+#	bins.append(minDist*minDist)
+#	rbins = np.array(bins)**0.5
+	rbins = np.array(bins)
 	rbins = rbins[::-1]
 	part = part[::-1]
 

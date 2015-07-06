@@ -1426,7 +1426,7 @@ static void dualtreeCCangular(const pcsource data1[],const pcsource data2[],void
 #ifndef USE_MPI
 
 #ifndef USE_OMP
-void ac_serial(const pcsource data[],void *root1,void *root2,bin bins[],double Lbox){
+void ac_serial(const pcsource data[],void *root1,void *root2,bin bins[],bin bins_periodic[],double Lbox){
 
 	TIMESTART(startTime);
 	DTAC(data,root1,root2,bins);
@@ -1439,10 +1439,21 @@ void ac_serial(const pcsource data[],void *root1,void *root2,bin bins[],double L
 	    for(k=-1;k<=1;k++) {
 	      if(!(i==0 && j==0 && k==0)) {
 		printf("Computing box [%d, %d, %d]\n",i,j,k);
-		DTCC(data,data,root1,root2,bins,Lbox,i,j,k);
+		DTCC(data,data,root1,root2,bins_periodic,Lbox,i,j,k);
+		/* print bins here */
+		/* int q;
+		for(q=0;q<NumBins;q++) {
+		  printf("bin[%d]: %d\n",q,bins[q].Cnt[0]);
+		}
+		printf("\n"); */
 	      }
 	    }
 	  }
+	}
+	/* add periodic counts to bins[] */
+	int q;
+	for(q=0;q<NumBins;q++) {
+	  bins[q].Cnt[0] += bins_periodic[q].Cnt[0] / 2;
 	}
 	#endif
 
