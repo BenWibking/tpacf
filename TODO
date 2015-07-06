@@ -1,6 +1,11 @@
 ==
 TODO
 
+*** Fix logic error when auto-correlation is computed with periodic boundaries
+    - it appears to add twice as many pairs as it should when doing the periodic
+      images.
+    - see MultFactor in bins.c!
+    - make fix for this less hack-ish
 ** Fix crash when cross-correlation is computing without any jackknife samples
-* Test cross-correlation function with periodic boundary conditions
+* Test cross-correlation function with periodic boundary conditions (DONE)
 * Add support for (plane-parallel) projected correlation functions

@@ -16,6 +16,6 @@
 #define TIMING
 //#define USE_MPI
 //#define USE_OMP
-#define DEBUGME
+//#define DEBUGME
 
 /* Parameters that control the estimation phase */
