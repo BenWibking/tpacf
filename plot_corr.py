@@ -11,11 +11,14 @@ parser.add_argument('xcorr_filename', help='filename of output cross-correlation
 
 args = parser.parse_args()
 
-filenames = [(args.hod_filename,1), (args.dm_filename,1), (args.xcorr_filename,2)]
+filenames = [(args.hod_filename,1,'galaxy'), (args.dm_filename,1,'matter'), (args.xcorr_filename,2,'galaxy-matter')]
 x = []
 y = []
 
-for filename,skiprows in filenames:
+fig = plt.figure()
+ax = fig.add_axes([0.1,0.1,0.8,0.8])
+
+for filename,skiprows,title in filenames:
 	f = open(filename,'r')
 	header = f.readline()
 	#f.close()
@@ -51,9 +54,11 @@ for filename,skiprows in filenames:
 
 	if skiprows==1:
 		ndens = npart / (Lbox**3)
+		mylabel = r"{t} $n={ndens:.2e}$".format(t=title,ndens=ndens)
 	else:
 		ndens = int(NumPart2)/(Lbox**3)
-	
+		mylabel = r"{t}".format(t=title)
+
 	V = rbins[1:]**3 - rbins[:-1]**3
 	RR = 4./3. * math.pi * V *ndens*npart
 	allxsi = part[:,1]/RR - 1.0
@@ -62,17 +67,25 @@ for filename,skiprows in filenames:
 	y.append(allxsi)
 
 	#plt.plot(np.log10(part[:,0]),np.log10(allxsi),'-o')
-	plt.plot(part[:,0],allxsi,'-o',label=filename)
-	plt.xscale('log')
-	plt.yscale('log')
+	ax.plot(part[:,0],allxsi,'-o',label=mylabel)
+	ax.set_xscale('log')
+	ax.set_yscale('log')
+	ax.set_xlabel(r'r ($h^{-1}$ Mpc)')
 
 bins = x[0]
 xsi = y[0]
 xsi_DM = y[1]
 xsi_xcorr = y[2]	
 
-plt.xlim((bins[0],bins[-1]))
-plt.legend(loc='best')
+ax.set_xlim((bins[0],bins[-1]))
+ax.legend(loc='best')
+hod_label = r"$\log M_{{min}}={logMmin}$, $\sigma_{{\log M}}={siglogM}$, $\log M_1={logM1}$, $\log M_0={logM0}$, $\alpha={alpha}$".format(siglogM=0.5, logMmin=12.5, logM0=12.5, logM1=13.5, alpha=1.0)
+ax.text(.02,.01,hod_label,verticalalignment='bottom',horizontalalignment='left',fontsize=16,transform=ax.transAxes)
+sim_label = r"$z={z}$ Abacus simulation".format(z=0.57)
+ax.text(.02,.99,sim_label,verticalalignment='bottom',horizontalalignment='left',fontsize=16,transform=ax.transAxes)
+plt.suptitle(r'two-point real-space correlations')
+
+fig.savefig('2pcf_gal.pdf')
 
 # compute galaxy bias                                                                                
 bias = np.sqrt(xsi/xsi_DM)
@@ -81,15 +94,19 @@ bias = np.sqrt(xsi/xsi_DM)
 corr = xsi_xcorr/np.sqrt(xsi*xsi_DM) # can be (much) greater than 1 (but this is still correct)!	
 
 plt.figure()
-plt.plot(bins, bias, '-o', label="bias")
+plt.plot(bins, bias, '-o', label="galaxy bias")
 plt.xscale('log')
 plt.xlim((bins[0],bins[-1]))
+plt.xlabel(r'r ($h^{-1}$ Mpc)')
 plt.legend(loc='best')
+plt.savefig('bias_gal.pdf')
 
 plt.figure()
-plt.plot(bins, corr, '-o', label="pseudo-correlation")
+plt.plot(bins, corr, '-o', label="galaxy-matter pseudo-correlation")
 plt.xscale('log')
+plt.xlabel(r'r ($h^{-1}$ Mpc)')
 plt.xlim((bins[0],bins[-1]))
 plt.legend(loc='best')
+plt.savefig('r_gm.pdf')
 
 plt.show()

@@ -124,7 +124,7 @@ void binPrint(char filename[],bin bins[],int Samples1[],int Samples2[],int BinTy
 	}
 
 	for(i=1;i<=NumBins;i++){
-		fprintf(out,"%16.12f %19llu",bins[i].center,MultFactor*bins[i].Cnt[0]);
+	  fprintf(out,"%16.12f %19llu %16.12f",bins[i].center,MultFactor*bins[i].Cnt[0],bins[i].limit);
 		for(j=1;j<=NumSamples;j++){
 			fprintf(out," %19llu",MultFactor*bins[i].Cnt[j]);
 		}
