@@ -120,6 +120,7 @@ int convertSpa_xyz_hdf5(char infile[],int NumSamples){
 	H5Dread(dataset, xyz_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
 
 	size_t i;
+	printf("dims[0]: %d\n",dims[0]);
 	for(i=0; i<3; i++) {
 	  printf("%f %f %f\n",data[i].x,data[i].y,data[i].z);
 	}

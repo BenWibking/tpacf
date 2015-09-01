@@ -21,8 +21,8 @@ THREADS=16
 TEMPFILE=sfilelist.xcorr
 TEMPFILE2=sparams.xcorr
 
-echo "HOD_particles.hdf5 1
-subsample_particles.hdf5 1" > $TEMPFILE
+echo "$1 1
+$2 1" > $TEMPFILE
 
 echo "$TEMPFILE
 $DOAUTOCORR

@@ -1,10 +1,15 @@
-#import pyqtgraph as plt
 import matplotlib.pyplot as plt
 import numpy as np
 import math
 
 import argparse
 parser = argparse.ArgumentParser()
+parser.add_argument('redshift',type=float)
+parser.add_argument('logMmin',type=float)
+parser.add_argument('siglogM',type=float)
+parser.add_argument('logM1',type=float)
+parser.add_argument('logM0',type=float)
+parser.add_argument('alpha',type=float)
 parser.add_argument('mindist',type=float)
 parser.add_argument('maxdist',type=float)
 parser.add_argument('boxsize',type=float)
@@ -29,8 +34,8 @@ for filename,skiprows,title in filenames:
 	NumBins = header_parts[0]
 	NumJackknife = header_parts[1]
 	npart = header_parts[2]
-	NumBins = int(NumBins) # ~30
-	npart = int(npart) # 10^6
+	NumBins = int(NumBins)
+	npart = int(npart)
 
 	print "numbins:",NumBins,"numjackknife:",NumJackknife,"npart:",npart
 	
@@ -45,17 +50,13 @@ for filename,skiprows,title in filenames:
 
 	#maxDist = 30.0 # can this be determined from the file?
 	#minDist = 0.1
-	#Lbox = 1911.2 # TODO: add as an argument
 
 	minDist = args.mindist
 	maxDist = args.maxdist
 	Lbox = args.boxsize
 
-#	bins = [maxDist*maxDist*(minDist/maxDist)**((2.*i)/(NumBins)) for i in xrange(NumBins)]
 	bins = [maxDist*(minDist/maxDist)**((1.*i)/(NumBins)) for i in xrange(NumBins)]
 	bins.append(minDist)
-#	bins.append(minDist*minDist)
-#	rbins = np.array(bins)**0.5
 	rbins = np.array(bins)
 	rbins = rbins[::-1]
 	part = part[::-1]
@@ -74,7 +75,6 @@ for filename,skiprows,title in filenames:
 	x.append(part[:,0])
 	y.append(allxsi)
 
-	#plt.plot(np.log10(part[:,0]),np.log10(allxsi),'-o')
 	ax.plot(part[:,0],allxsi,'-o',label=mylabel)
 	ax.set_xscale('log')
 	ax.set_yscale('log')
@@ -84,6 +84,15 @@ bins = x[0]
 xsi = y[0]
 xsi_DM = y[1]
 xsi_xcorr = y[2]	
+
+## save the properly-normalized values to HDF5 file
+from odo import odo
+output_filename = args.hod_filename+".2pcf.hdf5"
+
+odo(bins,output_filename+'::/bins').file.close()
+odo(xsi,output_filename+'::/xsi_gal').file.close()
+odo(xsi_DM,output_filename+'::/xsi_matter').file.close()
+odo(xsi_xcorr,output_filename+'::/xsi_gal_matter').file.close()
 
 ax.set_xlim((bins[0],bins[-1]))
 ax.legend(loc='best')
@@ -100,6 +109,21 @@ bias = np.sqrt(xsi/xsi_DM)
 
 # compute galaxy-mass 'correlation coefficient'                                                      
 corr = xsi_xcorr/np.sqrt(xsi*xsi_DM) # can be (much) greater than 1 (but this is still correct)!	
+
+## save to HDF5 file
+odo(bias,output_filename+'::/galaxy_bias').file.close()
+odo(corr,output_filename+'::/gal_matter_correlation').file.close()
+
+import h5py
+with h5py.File(output_filename) as h5f:
+	h5f['bins'].attrs.create('redshift',args.redshift)
+	h5f['bins'].attrs.create('logMmin',args.logMmin)
+	h5f['bins'].attrs.create('logM0',args.logM0)
+	h5f['bins'].attrs.create('logM1',args.logM1)
+	h5f['bins'].attrs.create('siglogM',args.siglogM)
+	h5f['bins'].attrs.create('alpha',args.alpha)
+
+## plotting
 
 plt.figure()
 plt.plot(bins, bias, '-o', label="galaxy bias")
