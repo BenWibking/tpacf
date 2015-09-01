@@ -8,10 +8,10 @@ CC = mpicc
 CFLAGS = $(CFLAGSSERIAL)
 INCLDIRS = $(HDF5_C_INCLUDE) -I /usr/include -I ../
 LFLAGS = -lm $(HDF5_C_LIBS) -lhdf5 -lhdf5_hl # -lsvml
-SOURCES = driver.c pcsource.c tree.c
+SOURCES = driver.c pcsource.c tree.c driver_correlate.c correlate.c bins.c pcsource_correlate.c tree_correlate.c
 OBJECTS = $(SOURCES:.c=.o)
-HEADERS = precompute.h ../params.h
-EXEC = precompute
+HEADERS = precompute.h globals.h correlation.h ../params.h
+EXEC = correlate
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLDIRS) -c $<

@@ -9,7 +9,7 @@
 #define MAXNUM_PER_FILE 500000000
 #define DEFAULT_NUM_SAMPLES 16
 #define MAX_ANGULAR_NODE_CNT 20
-#define MAX_SPATIAL_NODE_CNT 32
+#define MAX_SPATIAL_NODE_CNT 16
 
 /* Parameters that control the main correlation calculation */
 #define PERIODIC

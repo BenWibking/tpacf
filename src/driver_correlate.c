@@ -1,7 +1,7 @@
 #include "correlation.h"
 #include "globals.h"
 
-int main(int argc,char *argv[]){
+int main_correlate(char *argv){
 
 /*
 Driver routine to coordinate input/output and parallel correlation calculation
@@ -50,26 +50,14 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 	#ifdef USE_MPI
 		#ifdef USE_OMP
 			int ThreadSupport;
-			MPI_Init_thread(&argc,&argv,MPI_THREAD_MULTIPLE,&ThreadSupport);
+			MPI_Init_thread(&argv,MPI_THREAD_MULTIPLE,&ThreadSupport);
 		#else
-			MPI_Init(&argc,&argv);
+			MPI_Init(&argv);
 		#endif
 		MPI_Comm_rank(MPI_COMM_WORLD,&MyRank);
 		MPI_Comm_size(MPI_COMM_WORLD,&NumProcs);
 	#endif
 
-	/* Check to see if a parameter file was specified */
-	if(argc != 2){
-		#ifdef USE_MPI
-			if(MyRank == 0){
-				fprintf(stderr,"The parameter file must be included as the only command line argument...ABORTING\n");
-			}
-			MPI_Finalize();
-		#else
-			fprintf(stderr,"The parameter file must be included as the only command line argument...ABORTING\n");
-		#endif
-		exit(1);
-	}
 
 	/********************************************************************************
 	 First get all the parameters from argv[1] then allocate and initialize variables
@@ -78,9 +66,9 @@ Outputs:	Unnormalized bin counts including jackknife resampling
 
 	/* Get parameters from command line supplied file */
 	#ifdef USE_MPI
-		getParams(argv[1],fileList,&getDD,&getDR,&getRR,&WorkLevel,&minDist,&maxDist);
+		getParams(argv,fileList,&getDD,&getDR,&getRR,&WorkLevel,&minDist,&maxDist);
 	#else
-		getParams(argv[1],fileList,&getDD,&getDR,&getRR,&WorkLevel,&minDist,&maxDist,&Lbox);
+		getParams(argv,fileList,&getDD,&getDR,&getRR,&WorkLevel,&minDist,&maxDist,&Lbox);
 		printf("Box size: %lf\n",Lbox);
 	#endif
 

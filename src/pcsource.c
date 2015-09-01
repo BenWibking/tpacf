@@ -70,9 +70,7 @@ int convertSpa_xyz_hdf5(char infile[],int NumSamples){
 	pcsource pcdata;
 	//FILE *in,*out;
 	FILE *out;
-	#ifndef USE_DISK
-	int i;
-	#endif
+	size_t i;
 	
 	//in = fopen(infile,"r");
 	#ifdef USE_DISK
@@ -119,13 +117,12 @@ int convertSpa_xyz_hdf5(char infile[],int NumSamples){
 
 	H5Dread(dataset, xyz_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
 
-	size_t i;
 	printf("dims[0]: %d\n",dims[0]);
-	for(i=0; i<3; i++) {
-	  printf("%f %f %f\n",data[i].x,data[i].y,data[i].z);
+	if(NumSamples*MAX_SPATIAL_NODE_CNT > dims[0]) {
+	  printf("Number of particles must be greater than the number of jackknife samples times MAX_SPATIAL_NODE_CNT! Must quit.\n");
+	  exit(-1);
 	}
 
-	//while(!feof(in)){
 	for(i=0; i<dims[0]; i++) {
 	  pcdata.x = data[i].x;
 	  pcdata.y = data[i].y;
@@ -134,7 +131,7 @@ int convertSpa_xyz_hdf5(char infile[],int NumSamples){
 	  Cnt++;
 	  fwrite(&pcdata,sizeof(pcsource),1,out);
 	}
-	printf("%d\n",Cnt);
+
 	#ifndef USE_DISK
 	rewind(out);
 	fwrite(&NumSamples,sizeof(int),1,out);

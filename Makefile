@@ -1,35 +1,21 @@
-CORDIR = correlate
-PRECOMPDIR = precompute
-ESTDIR = estimators
+PRECOMPDIR = src
 BINDIR = bin
+
+default: all
 
 help:
 	@echo " "
 	@echo "Use one of the targets below"
 	@echo "	all:		build all programs"
 	@echo "	pre:		build precompute code"
-	@echo "	corr:		build correlation code"
-	@echo "	est:		build estimation code"
 	@echo "	clean:		clean all builds"
 
-all: corr pre est
-
-corr:
-	@cd $(CORDIR); make; mv correlate ../$(BINDIR)/;
+all: pre
 
 pre:
-	@cd $(PRECOMPDIR); make; mv precompute ../$(BINDIR)/;
+	@cd $(PRECOMPDIR); make; mv correlate ../$(BINDIR)/;
 
-est:
-	@cd $(ESTDIR); make; mv estimate ../$(BINDIR)/;
-
-clean: clean_corr clean_pre clean_est clean_bin
-
-clean_est:
-	@cd $(ESTDIR); make clean;
-
-clean_corr:
-	@cd $(CORDIR); make clean;
+clean: clean_pre clean_bin
 
 clean_pre:
 	@cd $(PRECOMPDIR); make clean;

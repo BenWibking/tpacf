@@ -35,11 +35,9 @@ $MAXBIN
 1
 $BOXSIZE" > $TEMPFILE2
 
-echo "Converting HDF5 to unformatted binary"
-$TPACF/bin/precompute $TEMPFILE $DOSPATIAL $JACKKNIFE_SAMPLES
+echo "Computing correlation..."
+OMP_NUM_THREADS=$THREADS $TPACF/bin/correlate $TEMPFILE $TEMPFILE2 $DOSPATIAL $JACKKNIFE_SAMPLES
 
-echo "Computing spatial correlation"
-OMP_NUM_THREADS=$THREADS $TPACF/bin/correlate $TEMPFILE2
 
 
 

@@ -14,13 +14,13 @@ int main(int argc, char *argv[]){
 	splitlog *dsplit;
 	FILE *list,*newlist;
 	
-	if(argc != 4 && argc != 3){
+	if(argc != 5 && argc != 4){
 		fprintf(stderr,"Usage:  precompute filenames.list 0 [NumSamples]\t for angular calculation\n");
 		fprintf(stderr,"Usage:  precompute filenames.list 1 [NumSamples]\t for spatial calculation\n");
 		exit(1);
 	}
 
-	AngOrSpa = atoi(argv[2]);
+	AngOrSpa = atoi(argv[3]);
 
 	if(AngOrSpa == 0){
 		fprintf(stdout,"Performing angular precomputing\n");
@@ -31,8 +31,8 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 	
-	if(argc == 4){
-		NumSamples = atoi(argv[3]);
+	if(argc == 5){
+		NumSamples = atoi(argv[4]);
 		if(NumSamples != 0){
 			dLogSamples = log((double)NumSamples)/M_LN2;
 			LogSamples = (int)(dLogSamples+0.5);
@@ -101,7 +101,11 @@ int main(int argc, char *argv[]){
 	remove(argv[1]); // why??
 	fclose(newlist);
 	rename(outfile,argv[1]); // why??
-	return 0;
+
+	// call correlate
+	printf("done precomputing.\n");
+
+	return main_correlate(argv[2]);
 }
 
 
